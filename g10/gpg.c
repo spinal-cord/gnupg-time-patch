@@ -379,6 +379,9 @@ enum cmd_and_opt_values
     oAllowWeakDigestAlgos,
     oWeakDigest,
 
+    oDate,                     // 
+    oForceDateCheck,          //
+
     oNoop
   };
 
@@ -386,7 +389,6 @@ enum cmd_and_opt_values
 static ARGPARSE_OPTS opts[] = {
 
     { 300, NULL, 0, N_("@Commands:\n ") },
-
     { aSign, "sign",      256, N_("|[file]|make a signature")},
     { aClearsign, "clearsign", 256, N_("|[file]|make a clear text signature")},
     { aDetachedSign, "detach-sign", 256, N_("make a detached signature")},
@@ -691,6 +693,10 @@ static ARGPARSE_OPTS opts[] = {
     { oPersonalDigestPreferences,  "personal-digest-preferences", 2, "@"},
     { oPersonalCompressPreferences,  "personal-compress-preferences", 2, "@"},
     { oWeakDigest,  "weak-digest", 2, "@"},
+
+    { oDate, "date", 2, "@" },  // 
+    { oForceDateCheck, "force-date-check", 0, "@" },  // 
+
     /* Aliases.  I constantly mistype these, and assume other people
        do as well. */
     { oPersonalCipherPreferences, "personal-cipher-prefs", 2, "@"},
@@ -2805,6 +2811,9 @@ main (int argc, char **argv )
           case oWeakDigest:
 	    additional_weak_digest(pargs.r.ret_str);
 	    break;
+          case oDate:  opt.date_string = pargs.r.ret_str; break;
+          case oForceDateCheck:   opt.force_date_check = 1;  break;
+
           case oLCctype: opt.lc_ctype = pargs.r.ret_str; break;
           case oLCmessages: opt.lc_messages = pargs.r.ret_str; break;
 	  case oGroup: add_group(pargs.r.ret_str); break;

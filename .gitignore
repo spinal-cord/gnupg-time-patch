@@ -77,3 +77,4 @@ util/libutil.a
 /doc/gnupg.info
 /doc/gnupg.info-1
 /doc/gnupg.info-2
+.DS_Store

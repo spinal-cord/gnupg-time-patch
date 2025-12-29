@@ -29,6 +29,7 @@
 #endif
 #include "types.h"
 #include "util.h"
+#include "../g10/options.h"
 #include "i18n.h"
 
 #ifndef HAVE_TIMEGM
@@ -48,7 +49,41 @@ time_t timegm (struct tm *tm);
 u32
 make_timestamp()
 {
-    return time(NULL);
+    if (opt.date_string) {
+        if (!strcmp(opt.date_string, "now") ||
+            !strcmp(opt.date_string, "0") ||
+            !strcmp(opt.date_string, "1")) {
+            return time(NULL);
+        }
+        else {
+            struct tm tm = {0};
+            int year, month = 1, day = 1, hour = 0, min = 0, sec = 0;
+            int n = sscanf(opt.date_string, "%d-%d-%d %d:%d:%d", &year, &month, &day, &hour, &min, &sec);
+            if (n < 1 || year < 1970 || year > 2100 || month < 1 || month > 12 || day < 1 || day > 31 ||
+                hour < 0 || hour > 23 || min < 0 || min > 59 || sec < 0 || sec > 59) {
+                /* Fixed timestamp for 2012-12-12 00:00:00 UTC */
+                return 1355270400UL;
+            }
+            tm.tm_year = year - 1900;
+            tm.tm_mon = month - 1;
+            tm.tm_mday = day;
+            tm.tm_hour = hour;
+            tm.tm_min = min;
+            tm.tm_sec = sec;
+            tm.tm_isdst = -1;
+            time_t t = timegm(&tm);
+            if (t == (time_t)-1) {
+                return 1355270400UL;
+            }
+            return (u32)t;
+        }
+    }
+
+    if (opt.force_date_check) {
+        return time(NULL);
+    }
+    /* Fixed timestamp for 2012-12-12 00:00:00 UTC */
+    return 1355270400UL;
 }
 
 /****************

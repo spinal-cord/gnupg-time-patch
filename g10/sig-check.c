@@ -196,18 +196,23 @@ do_check_messages( PKT_public_key *pk, PKT_signature *sig,
       }
 
     cur_time = make_timestamp();
-    if( pk->timestamp > cur_time )
-      {
-	ulong d = pk->timestamp - cur_time;
-	log_info( d==1
-		  ? _("key %s was created %lu second"
-		      " in the future (time warp or clock problem)\n")
-		  : _("key %s was created %lu seconds"
-		      " in the future (time warp or clock problem)\n"),
-		  keystr_from_pk(pk),d );
-	if( !opt.ignore_time_conflict )
-	  return G10ERR_TIME_CONFLICT;
-      }
+
+    if (opt.force_date_check)
+    {
+        u32 cur_time = make_timestamp();
+        if (pk->timestamp > cur_time)
+        {
+            ulong d = pk->timestamp - cur_time;
+            log_info(d == 1
+                ? _("key %s was created %lu second"
+                    " in the future (time warp or clock problem)\n")
+                : _("key %s was created %lu seconds"
+                    " in the future (time warp or clock problem)\n"),
+                keystr_from_pk(pk), d);
+            if (!opt.ignore_time_conflict)
+                return G10ERR_TIME_CONFLICT;
+        }
+    }
 
     /* Check whether the key has expired.  We check the has_expired
        flag which is set after a full evaluation of the key (getkey.c)
